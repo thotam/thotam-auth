@@ -1,0 +1,54 @@
+{
+    "name": "thotam/thotam-auth",
+    "description": "Custom Laravel Auth package by ThoTam",
+    "keywords": [
+        "thotam",
+        "thotam-auth"
+    ],
+    "homepage": "https://github.com/thotam/thotam-auth",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "thotam",
+            "email": "thanhtamtqno1@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Thotam\\ThotamAuth\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Thotam\\ThotamAuth\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Thotam\\ThotamAuth\\ThotamAuthServiceProvider"
+            ],
+            "aliases": {
+                "ThotamAuth": "Thotam\\ThotamAuth\\ThotamAuthFacade"
+            }
+        }
+    }
+}
