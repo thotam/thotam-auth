@@ -49,7 +49,6 @@ class FortifyServiceProvider extends ServiceProvider
             \Laravel\Fortify\Contracts\RegisterResponse::class,
             \Thotam\ThotamAuth\Http\Responses\RegisterResponse::class
         );
-
         Fortify::registerView(fn () => view('thotam-auth::auth.register', ['urlback' => request("urlback")]));
     }
 }
