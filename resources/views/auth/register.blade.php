@@ -16,14 +16,14 @@
                     <!-- Logo -->
                     <div class="d-flex justify-content-center align-items-center pb-2 mb-4">
                         <div class="ui-w-120">
-                            <div class="w-100 position-relative" style="padding-bottom: 54%">
+                            <div class="w-100 position-relative pb-2">
                                 @include('layouts.includes.sub.logo')
                             </div>
                         </div>
                     </div>
                     <!-- / Logo -->
 
-                    <h5 class="text-center text-muted font-weight-normal mb-4">Create an Account</h5>
+                    <h5 class="text-center text-muted font-weight-normal mb-4">{{ __('Create an Account') }}</h5>
 
                     <!-- Form -->
                     <form>
