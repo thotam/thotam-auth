@@ -23,23 +23,54 @@
                     </div>
                     <!-- / Logo -->
 
-                    <h5 class="text-center text-muted font-weight-normal mb-4">{{ __('Create an Account') }}</h5>
+                    <h5 class="text-center text-muted font-weight-normal mb-4">Đăng ký tài khoản</h5>
 
                     <!-- Form -->
-                    <form>
+                    <form role="form" id="login-register-form" method="POST" action="{{route('register', ['urlback' => request("urlback")]) }}">
+                        @csrf
+
                         <div class="form-group">
-                            <label class="form-label">Your name</label>
-                            <input type="text" class="form-control">
+                            <label class="form-label" for="name">Họ và tên</label>
+                            <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}"  autocomplete="name" >
+                            @error('name')
+                                <label class="error jquery-validation-error small form-text invalid-feedback" for="name" style="display: inline-block;">{{ $message }}</label>
+                            @enderror
                         </div>
+
                         <div class="form-group">
-                            <label class="form-label">Your email</label>
-                            <input type="text" class="form-control">
+                            <label class="form-label" for="email">Email</label>
+                            <input id="email" type="text" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}"  autocomplete="email" >
+                            @error('email')
+                                <label class="error jquery-validation-error small form-text invalid-feedback" for="email" style="display: inline-block;">{{ $message }}</label>
+                            @enderror
                         </div>
+
                         <div class="form-group">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control">
+                        <label class="form-label" for="phone">Số điện thoại</label>
+                            <input id="phone" type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" value="{{ old('phone') }}"  autocomplete="phone" >
+                            @error('phone')
+                                <label class="error jquery-validation-error small form-text invalid-feedback" for="phone" style="display: inline-block;">{{ $message }}</label>
+                            @enderror
                         </div>
-                        <button type="button" class="btn btn-primary btn-block mt-4">Sign Up</button>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password">Mật khẩu</label>
+                            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" autocomplete="new-password">
+                            @error('password')
+                                <label class="error jquery-validation-error small form-text invalid-feedback" for="password" style="display: inline-block;">{{ $message }}</label>
+                            @enderror
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="password_confirmation">Nhập lại mật khẩu</label>
+                            <input id="password_confirmation" type="password" class="form-control" name="password_confirmation" autocomplete="new-password">
+                            @error('password_confirmation')
+                                <label class="error jquery-validation-error small form-text invalid-feedback" for="password_confirmation" style="display: inline-block;">{{ $message }}</label>
+                            @enderror
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block mt-4">Đăng ký</button>
+
                         <div class="text-light small mt-4">
                             By clicking "Sign Up", you agree to our
                             <a href="javascript:void(0)">terms of service and privacy policy</a>.
@@ -51,7 +82,7 @@
                 </div>
                 <div class="card-footer py-3 px-4 px-sm-5">
                     <div class="text-center text-muted">
-                        Already have an account? <a href="javascript:void(0)">Sign In</a>
+                        Bạn đã có tài khoản? <a href="{{URL::route('login', ['urlback' => request("urlback")]) }}">Đăng nhập</a>
                     </div>
                 </div>
             </div>
