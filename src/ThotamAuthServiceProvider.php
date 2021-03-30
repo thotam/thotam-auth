@@ -43,6 +43,7 @@ class ThotamAuthServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../stubs/Fortify/CreateNewUser.php' => app_path('Actions/Fortify/CreateNewUser.php'),
                 __DIR__.'/../stubs/Fortify/FortifyServiceProvider.php' => app_path('Providers/FortifyServiceProvider.php'),
+                __DIR__.'/../stubs/Middleware/Authenticate.php' => app_path('Http/Middleware/Authenticate.php'),
             ], 'fortify');
 
             // Registering package commands.
