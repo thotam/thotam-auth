@@ -15,7 +15,7 @@ class ThotamAuthServiceProvider extends ServiceProvider
          * Optional methods to load your package assets
          */
         // $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'thotam-auth');
-        // $this->loadViewsFrom(__DIR__.'/../resources/views', 'thotam-auth');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'thotam-auth');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         // $this->loadRoutesFrom(__DIR__.'/routes.php');
 
@@ -38,6 +38,12 @@ class ThotamAuthServiceProvider extends ServiceProvider
             /*$this->publishes([
                 __DIR__.'/../resources/lang' => resource_path('lang/vendor/thotam-auth'),
             ], 'lang');*/
+
+            // Publishing the Fortify files.
+            $this->publishes([
+                __DIR__.'/../stubs/Fortify/CreateNewUser.php' => app_path('Actions/Fortify/CreateNewUser.php'),
+                __DIR__.'/../stubs/Fortify/FortifyServiceProvider.php' => app_path('Providers/FortifyServiceProvider.php'),
+            ], 'fortify');
 
             // Registering package commands.
             // $this->commands([]);
