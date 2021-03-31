@@ -78,5 +78,7 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::requestPasswordResetLinkView(fn () => view('thotam-auth::auth.password-reset'));
+
+        Fortify::resetPasswordView(fn ($request) => view('thotam-auth::auth.password-resetting', ['request' => $request]));
     }
 }
