@@ -37,6 +37,12 @@ Public FortifyProvider
 php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
 ```
 
+Next, you should migrate your database:
+
+```php
+php artisan migrate
+```
+
 ### Testing
 
 ```bash
