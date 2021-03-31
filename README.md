@@ -17,20 +17,15 @@ composer require thotam/thotam-auth
 
 ## Usage
 
-````php
-## Publish DataTables assets
-
 ```php
-php artisan vendor:publish --tag=datatables-buttons
-````
-
-````
+Add "phone", "active" to fillable of User Models
+```
 
 ### Testing
 
-``` bash
+```bash
 composer test
-````
+```
 
 ### Changelog
 
