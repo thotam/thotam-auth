@@ -25,19 +25,19 @@ Add "phone", "active" to fillable of User Models
 Add "App\Providers\FortifyServiceProvider::class" to "config\app.php"
 ```
 
--   Public ThotamAuthProvider
+#### Public ThotamAuthProvider
 
 ```php
 php artisan vendor:publish --provider="Thotam\ThotamAuth\ThotamAuthServiceProvider" --force
 ```
 
--   Public FortifyProvider
+#### Public FortifyProvider
 
 ```php
 php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
 ```
 
--   Next, you should migrate your database:
+#### Next, you should migrate your database:
 
 ```php
 php artisan migrate
