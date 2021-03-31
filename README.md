@@ -17,15 +17,20 @@ composer require thotam/thotam-auth
 
 ## Usage
 
-``` php
-// Usage description here
-```
+````php
+## Publish DataTables assets
+
+```php
+php artisan vendor:publish --tag=datatables-buttons
+````
+
+````
 
 ### Testing
 
 ``` bash
 composer test
-```
+````
 
 ### Changelog
 
@@ -41,8 +46,8 @@ If you discover any security related issues, please email thanhtamtqno1@gmail.co
 
 ## Credits
 
-- [thotam](https://github.com/thotam)
-- [All Contributors](../../contributors)
+-   [thotam](https://github.com/thotam)
+-   [All Contributors](../../contributors)
 
 ## License
 
