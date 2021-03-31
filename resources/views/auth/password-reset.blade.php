@@ -6,7 +6,7 @@
 @endsection
 
 @section('content')
-    <div class="authentication-wrapper authentication-2 px-4">
+    <div class="authentication-wrapper authentication-2 ui-bg-cover ui-bg-overlay-container px-4" style="background-image: url('/img/bg/1.jpg');">
         <div class="authentication-inner py-5">
 
             @if (session('status'))
