@@ -23,7 +23,7 @@
                     </div>
                     <!-- / Logo -->
 
-                    <h5 class="text-center text-muted font-weight-normal mb-4">Đăng ký tài khoản</h5>
+                    <h5 class="text-center text-muted font-weight-normal mb-4">Đặt lại mật khẩu</h5>
 
                     <!-- Form -->
                     <form role="form" id="login-register-form" method="POST" action="{{route('password.update', ['urlback' => request("urlback")]) }}">
