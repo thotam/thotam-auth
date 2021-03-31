@@ -21,6 +21,18 @@ composer require thotam/thotam-auth
 Add "phone", "active" to fillable of User Models
 ```
 
+```php
+Add "App\Providers\FortifyServiceProvider::class" to "config\app.php"
+```
+
+```php
+Public ThotamAuthProvider by command php artisan vendor:publish --provider="Thotam\ThotamAuth\ThotamAuthServiceProvider" --force
+```
+
+```php
+Public FortifyProvider by command php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
+```
+
 ### Testing
 
 ```bash
