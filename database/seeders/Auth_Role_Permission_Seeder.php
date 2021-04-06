@@ -45,6 +45,12 @@ class Auth_Role_Permission_Seeder extends Seeder
             $permission[] = Permission::where("name", "delete-user")->first();
         }
 
+        if (Permission::where("name", "reset-password-user")->count() == 0) {
+            $permission[] = Permission::create(['name' => 'reset-password-user', "description" => "Reset Mật khẩu Người dùng", "group" => "User", "order" => 6, "lock" => true,]);
+        } else {
+            $permission[] = Permission::where("name", "reset-password-user")->first();
+        }
+
         if (Role::where("name", "super-admin")->count() == 0) {
             $super_admin =  Role::create(['name' => 'super-admin', "description" => "Super Admin", "group" => "Admin", "order" => 1, "lock" => true,]);
         } else {
