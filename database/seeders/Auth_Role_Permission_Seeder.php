@@ -15,7 +15,7 @@ class Auth_Role_Permission_Seeder extends Seeder
      */
     public function run()
     {
-        if (Permission::where("name", "view-users")->count() == 0) {
+        if (Permission::where("name", "view-user")->count() == 0) {
             $permission[] = Permission::create(['name' => 'view-user', "description" => "Xem Người dùng", "group" => "User", "order" => 1, "lock" => true,]);
         } else {
             $permission[] = Permission::where("name", "view-user")->first();
