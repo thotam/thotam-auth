@@ -41,6 +41,7 @@ php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
 
 ```php
 Add Thotam\ThotamAuth\Http\Middleware\CheckAccount::Class To App\Http\Kernel.php in $middlewareGroups["web"]
+Add Thotam\ThotamAuth\Http\Middleware\CheckAccount::Class To App\Http\Kernel.php in $routeMiddleware
 ```
 
 #### Next, you should migrate your database:
