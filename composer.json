@@ -28,13 +28,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Thotam\\ThotamAuth\\": "src"
+            "Thotam\\ThotamAuth\\": "src",
+            "Thotam\\ThotamAuth\\Database\\Seeders\\": "database/seeders"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Thotam\\ThotamAuth\\Tests\\": "tests",
-            "Thotam\\ThotamAuth\\Database\\Seeders\\": "database/seeders"
+            "Thotam\\ThotamAuth\\Tests\\": "tests"
         }
     },
     "scripts": {
