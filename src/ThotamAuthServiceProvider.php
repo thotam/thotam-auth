@@ -2,7 +2,9 @@
 
 namespace Thotam\ThotamAuth;
 
+use Livewire\Livewire;
 use Illuminate\Support\ServiceProvider;
+use Thotam\ThotamAuth\Http\Livewire\AuthLivewire;
 
 class ThotamAuthServiceProvider extends ServiceProvider
 {
@@ -70,5 +72,9 @@ class ThotamAuthServiceProvider extends ServiceProvider
         $this->app->singleton('thotam-auth', function () {
             return new ThotamAuth;
         });
+
+        if (class_exists(Livewire::class)) {
+            Livewire::component('thotam-auth::auth-livewire', AuthLivewire::class);
+        }
     }
 }
