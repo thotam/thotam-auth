@@ -5,6 +5,7 @@ namespace Thotam\ThotamAuth\Http\Livewire;
 use Auth;
 use App\Models\User;
 use Livewire\Component;
+use Thotam\ThotamHr\Models\HR;
 use App\Actions\Fortify\PasswordValidationRules;
 
 class AuthLivewire extends Component
@@ -20,6 +21,7 @@ class AuthLivewire extends Component
     public $modal_title, $toastr_message;
     public $hr;
     public $user_id, $user;
+    public $hr_info_arrays;
 
     /**
      * @var bool
@@ -74,7 +76,7 @@ class AuthLivewire extends Component
                 'unique:users,phone,'.$this->user_id,
             ],
             'active' => 'nullable|boolean',
-            'hr_key' => 'nullable|exists:hr,key',
+            'hr_key' => 'nullable|exists:hrs,key',
             'password' => $this->passwordRules(),
         ];
     }
@@ -219,4 +221,83 @@ class AuthLivewire extends Component
         $this->cancel();
         $this->dispatchBrowserEvent('toastr', ['type' => 'success', 'title' => "Thành công", 'message' => $toastr_message]);
     }
+
+    /**
+     * link_user
+     *
+     * @param  mixed $user
+     * @return void
+     */
+    public function link_user(User $user)
+    {
+        if ($this->hr->cannot("link-user")) {
+            $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => "Bạn không có quyền thực hiện hành động này"]);
+            $this->cancel();
+            return null;
+        }
+
+        $this->user = $user;
+        $this->user_id = $this->user->id;
+        $this->name = $this->user->name;
+        $this->email = $this->user->email;
+        $this->phone = $this->user->phone;
+        $this->hr_key = $this->user->hr_key;
+
+        $this->hr_info_arrays = HR::select("key", "hoten")->get()->toArray();;
+
+        $this->linkStatus = true;
+        $this->modal_title = "Liên kết Tài khoản - ID: ".$this->user_id;
+        $this->toastr_message = "Liên kết Tài khoản thành công";
+
+        $this->dispatchBrowserEvent('unblockUI');
+        $this->dispatchBrowserEvent('dynamic_update');
+        $this->dispatchBrowserEvent('show_modal', "#link_modal");
+    }
+
+    /**
+     * link_user_save
+     *
+     * @return void
+     */
+    public function link_user_save()
+    {
+        if ($this->hr->cannot("link-user")) {
+            $this->dispatchBrowserEvent('unblockUI');
+            $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => "Bạn không có quyền thực hiện hành động này"]);
+            return null;
+        }
+
+        //Xác thực dữ liệu
+        $this->dispatchBrowserEvent('unblockUI');
+        $this->validate([
+            'hr_key' => 'nullable|exists:hrs,key',
+        ]);
+        $this->dispatchBrowserEvent('blockUI');
+
+        try {
+            if (!!$this->hr_key) {
+                $this->user->update([
+                    "hr_key" => $this->hr_key
+                ]);
+            } else {
+                $this->user->hr()->dissociate()->save();
+            }
+
+        } catch (\Illuminate\Database\QueryException $e) {
+            $this->dispatchBrowserEvent('unblockUI');
+            $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => implode(" - ", $e->errorInfo)]);
+            return null;
+        } catch (\Exception $e2) {
+            $this->dispatchBrowserEvent('unblockUI');
+            $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => $e2->getMessage()]);
+            return null;
+        }
+
+        //Đẩy thông tin về trình duyệt
+        $this->dispatchBrowserEvent('dt_draw');
+        $toastr_message = $this->toastr_message;
+        $this->cancel();
+        $this->dispatchBrowserEvent('toastr', ['type' => 'success', 'title' => "Thành công", 'message' => $toastr_message]);
+    }
+
 }

@@ -1,6 +1,7 @@
 <div>
     <!-- Incluce các modal -->
     @include('thotam-auth::livewire.auth.modal.add_edit_modal')
+    @include('thotam-auth::livewire.auth.modal.link_modal')
 
     <!-- Scripts -->
     @push('livewires')
