@@ -17,14 +17,14 @@ class CheckAccount
      */
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::user()->active === 0) {
+        if (optional(Auth::user())->active === 0) {
             return response()->view('errors.dynamic',[
                 'title' => 'Tài khoản đã bị vô hiệu hóa',
                 'error_code' => '403',
                 'error_description' => 'Không có quyền truy cập',
                 'text_xlarge' => 'Vui lòng liên hệ phòng truyền thông để được trợ giúp',
                 ]);
-        } elseif (!!!Auth::user()->active) {
+        } elseif (!!!optional(Auth::user())->active) {
             return response()->view('errors.dynamic',[
                 'title' => 'Tài khoản chưa được kích hoạt',
                 'error_code' => '403',
