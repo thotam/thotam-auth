@@ -6,6 +6,7 @@ use Auth;
 use App\Models\User;
 use Livewire\Component;
 use Thotam\ThotamHr\Models\HR;
+use Illuminate\Support\Facades\Hash;
 use App\Actions\Fortify\PasswordValidationRules;
 
 class AuthLivewire extends Component
@@ -97,6 +98,13 @@ class AuthLivewire extends Component
     public function updatedName()
     {
         $this->name = mb_convert_case(trim($this->name), MB_CASE_TITLE, "UTF-8");
+    }
+
+    public function updatedPasswordConfirmation()
+    {
+        $this->validate([
+            'password' => $this->passwordRules(),
+        ]);
     }
 
     /**
@@ -300,4 +308,71 @@ class AuthLivewire extends Component
         $this->dispatchBrowserEvent('toastr', ['type' => 'success', 'title' => "Thành công", 'message' => $toastr_message]);
     }
 
+    /**
+     * reset_password
+     *
+     * @param  mixed $user
+     * @return void
+     */
+    public function reset_password(User $user)
+    {
+        if ($this->hr->cannot("reset-password-user")) {
+            $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => "Bạn không có quyền thực hiện hành động này"]);
+            $this->cancel();
+            return null;
+        }
+
+        $this->user = $user;
+        $this->user_id = $this->user->id;
+        $this->name = $this->user->name;
+        $this->email = $this->user->email;
+        $this->phone = $this->user->phone;
+
+        $this->resetStatus = true;
+        $this->modal_title = "Reset mật khẩu - ID: ".$this->user_id;
+        $this->toastr_message = "Reset mật khẩu thành công";
+
+        $this->dispatchBrowserEvent('unblockUI');
+        $this->dispatchBrowserEvent('dynamic_update');
+        $this->dispatchBrowserEvent('show_modal', "#reset_password_modal");
+    }
+
+    /**
+     * reset_password_save
+     *
+     * @return void
+     */
+    public function reset_password_save()
+    {
+        if ($this->hr->cannot("reset-password-user")) {
+            $this->dispatchBrowserEvent('unblockUI');
+            $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => "Bạn không có quyền thực hiện hành động này"]);
+            return null;
+        }
+
+        //Xác thực dữ liệu
+        $this->dispatchBrowserEvent('unblockUI');
+        $this->validate([
+            'password' => $this->passwordRules(),
+        ]);
+        $this->dispatchBrowserEvent('blockUI');
+
+        try {
+            $this->user->forceFill(['password' => Hash::make($this->password),])->save();
+        } catch (\Illuminate\Database\QueryException $e) {
+            $this->dispatchBrowserEvent('unblockUI');
+            $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => implode(" - ", $e->errorInfo)]);
+            return null;
+        } catch (\Exception $e2) {
+            $this->dispatchBrowserEvent('unblockUI');
+            $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => $e2->getMessage()]);
+            return null;
+        }
+
+        //Đẩy thông tin về trình duyệt
+        $this->dispatchBrowserEvent('dt_draw');
+        $toastr_message = $this->toastr_message;
+        $this->cancel();
+        $this->dispatchBrowserEvent('toastr', ['type' => 'success', 'title' => "Thành công", 'message' => $toastr_message]);
+    }
 }
