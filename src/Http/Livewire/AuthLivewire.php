@@ -162,7 +162,11 @@ class AuthLivewire extends Component
 
         $this->user = $user;
         $this->user_id = $this->user->id;
-        $this->name = $this->user->name;
+        if (!!$this->user->update_hr) {
+            $this->name = $this->user->update_hr->hoten;
+        } else {
+            $this->name = $this->user->name;
+        }
         $this->email = $this->user->email;
         $this->phone = $this->user->phone;
         $this->active = !!$this->user->active;
@@ -246,7 +250,11 @@ class AuthLivewire extends Component
 
         $this->user = $user;
         $this->user_id = $this->user->id;
-        $this->name = $this->user->name;
+        if (!!$this->user->update_hr) {
+            $this->name = $this->user->update_hr->hoten;
+        } else {
+            $this->name = $this->user->name;
+        }
         $this->email = $this->user->email;
         $this->phone = $this->user->phone;
         $this->hr_key = $this->user->hr_key;
@@ -324,7 +332,11 @@ class AuthLivewire extends Component
 
         $this->user = $user;
         $this->user_id = $this->user->id;
-        $this->name = $this->user->name;
+        if (!!$this->user->update_hr) {
+            $this->name = $this->user->update_hr->hoten;
+        } else {
+            $this->name = $this->user->name;
+        }
         $this->email = $this->user->email;
         $this->phone = $this->user->phone;
 
