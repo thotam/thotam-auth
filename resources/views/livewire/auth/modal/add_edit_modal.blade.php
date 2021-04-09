@@ -51,7 +51,7 @@
                             </div>
 
                             <div class="col-12">
-                                <div class="input-group form-group border-bottom cpc1hn-border py-2">
+                                <div class="input-group form-group border-bottom thotam-border py-2">
                                     <div class="input-group-prepend mr-4">
                                         <label class="col-form-label col-6 text-left pt-0 input-group-text border-0" for="active">Kích hoạt tài khoản:</label>
                                     </div>
