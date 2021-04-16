@@ -17,14 +17,6 @@ composer require thotam/thotam-auth
 
 ## Usage
 
-```php
-Add "phone", "active" to fillable of User Models
-```
-
-```php
-Add "App\Providers\FortifyServiceProvider::class" to "config\app.php"
-```
-
 #### Public ThotamAuthProvider
 
 ```php
@@ -37,10 +29,18 @@ php artisan vendor:publish --provider="Thotam\ThotamAuth\ThotamAuthServiceProvid
 php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
 ```
 
+```php
+Add "phone", "active" to fillable of User Models
+```
+
+```php
+Add "App\Providers\FortifyServiceProvider::class" to "config\app.php"
+```
+
 #### Add CheckAccount Middleware
 
 ```php
-Add Thotam\ThotamAuth\Http\Middleware\CheckAccount::Class To App\Http\Kernel.php in $routeMiddleware
+Add 'CheckAccount' => Thotam\ThotamAuth\Http\Middleware\CheckAccount::Class To App\Http\Kernel.php in $routeMiddleware
 ```
 
 #### Next, you should migrate your database:
