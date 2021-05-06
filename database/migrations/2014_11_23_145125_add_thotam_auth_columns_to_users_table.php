@@ -16,6 +16,10 @@ class AddThotamAuthColumnsToUsersTable extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->string('phone', 30)->after('email')->nullable()->unique();
             $table->boolean('active')->after('phone')->nullable()->default(null);
+            $table->unsignedBigInteger('created_by')->nullable()->default(null);
+            $table->unsignedBigInteger('updated_by')->nullable()->default(null);
+            $table->unsignedBigInteger('deleted_by')->nullable()->default(null);
+            $table->softDeletes();
         });
     }
 
