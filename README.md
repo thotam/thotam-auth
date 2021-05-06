@@ -31,6 +31,7 @@ php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
 
 ```php
 Add "phone", "active" to fillable of User Models
+Add     use SoftDeletes; use Userstamps; to  User Models
 ```
 
 ```php
