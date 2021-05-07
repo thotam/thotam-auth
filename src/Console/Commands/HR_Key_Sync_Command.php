@@ -11,7 +11,7 @@ class HR_Key_Sync_Command extends Command
      *
      * @var string
      */
-    protected $signature = 'thotam-auth:hr_key-sync';
+    protected $signature = 'thotam-auth:hr-key-sync';
 
     /**
      * The console command description.
