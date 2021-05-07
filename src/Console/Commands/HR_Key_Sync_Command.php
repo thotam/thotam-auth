@@ -38,7 +38,22 @@ class HR_Key_Sync_Command extends Command
      */
     public function handle()
     {
-        dd(User::first());
+        $members = User::whereNull('hr_key')->whereNotNull('info_mnv')->limit(100)->get();
+
+        foreach ($members as $member) {
+            $member->update([
+                'hr_key' => $member->info_mnv,
+            ]);
+        }
+
+        $betas = User::whereNull('info_mnv')->whereNotNull('hr_key')->limit(100)->get();
+
+        foreach ($betas as $beta) {
+            $beta->update([
+                'info_mnv' => $beta->hr_key,
+            ]);
+        }
+
         return 0;
     }
 }

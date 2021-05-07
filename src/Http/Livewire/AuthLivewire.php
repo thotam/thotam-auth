@@ -7,6 +7,7 @@ use App\Models\User;
 use Livewire\Component;
 use Thotam\ThotamHr\Models\HR;
 use Illuminate\Support\Facades\Hash;
+use Thotam\ThotamAuth\Jobs\HR_Sync_Job;
 use App\Actions\Fortify\PasswordValidationRules;
 
 class AuthLivewire extends Component
@@ -299,6 +300,7 @@ class AuthLivewire extends Component
                 $this->user->hr()->dissociate()->save();
             }
 
+            HR_Sync_Job::dispatch($this->user);
         } catch (\Illuminate\Database\QueryException $e) {
             $this->dispatchBrowserEvent('unblockUI');
             $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => implode(" - ", $e->errorInfo)]);
