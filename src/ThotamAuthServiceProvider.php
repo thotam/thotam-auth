@@ -5,6 +5,7 @@ namespace Thotam\ThotamAuth;
 use Livewire\Livewire;
 use Illuminate\Support\ServiceProvider;
 use Thotam\ThotamAuth\Http\Livewire\AuthLivewire;
+use Thotam\ThotamAuth\Console\Commands\HR_Key_Sync_Command;
 
 class ThotamAuthServiceProvider extends ServiceProvider
 {
@@ -49,7 +50,9 @@ class ThotamAuthServiceProvider extends ServiceProvider
             ], 'fortify');
 
             // Registering package commands.
-            // $this->commands([]);
+            $this->commands([
+                HR_Key_Sync_Command::class,
+            ]);
         }
 
         /*
