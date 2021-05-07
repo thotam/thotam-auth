@@ -3,6 +3,7 @@
 namespace Thotam\ThotamAuth\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\Models\User;
 
 class HR_Key_Sync_Command extends Command
 {
@@ -37,7 +38,7 @@ class HR_Key_Sync_Command extends Command
      */
     public function handle()
     {
-        dd(1111);
+        dd(User::first());
         return 0;
     }
 }
