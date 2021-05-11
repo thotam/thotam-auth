@@ -41,12 +41,12 @@
                                 </div>
                             </div>
 
-                            @if (!!Auth::user()->update_hr)
+                            @if (!!$user->update_hr)
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label class="col-form-label">Họ tên:</label>
                                         <div id="name_div">
-                                            <span class="form-control px-2"  style="width: 100%">{{ Auth::user()->update_hr->hoten }}</span>
+                                            <span class="form-control px-2"  style="width: 100%">{{ $user->update_hr->hoten }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -55,7 +55,7 @@
                                     <div class="form-group">
                                         <label class="col-form-label">Mã nhân sự:</label>
                                         <div id="name_div">
-                                            <span class="form-control px-2"  style="width: 100%">{{ Auth::user()->update_hr->hr_key }}</span>
+                                            <span class="form-control px-2"  style="width: 100%">{{ $user->update_hr->hr_key }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -64,7 +64,7 @@
                                     <div class="form-group">
                                         <label class="col-form-label">Nhóm:</label>
                                         <div id="name_div">
-                                            <span class="form-control px-2"  style="width: 100%">{{ Auth::user()->update_hr->nhom }}</span>
+                                            <span class="form-control px-2"  style="width: 100%">{{ $user->update_hr->nhom }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -73,7 +73,7 @@
                                     <div class="form-group">
                                         <label class="col-form-label">Ngày sinh:</label>
                                         <div id="name_div">
-                                            <span class="form-control px-2"  style="width: 100%">{{ Auth::user()->update_hr->ngaysinh->format('d-m-Y') }}</span>
+                                            <span class="form-control px-2"  style="width: 100%">{{ $user->update_hr->ngaysinh->format('d-m-Y') }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -82,7 +82,7 @@
                                     <div class="form-group">
                                         <label class="col-form-label">Ngày thử việc:</label>
                                         <div id="name_div">
-                                            <span class="form-control px-2"  style="width: 100%">{{ Auth::user()->update_hr->hoten->format('d-m-Y') }}</span>
+                                            <span class="form-control px-2"  style="width: 100%">{{ $user->update_hr->ngaythuviec->format('d-m-Y') }}</span>
                                         </div>
                                     </div>
                                 </div>
