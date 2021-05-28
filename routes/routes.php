@@ -14,7 +14,7 @@ use Thotam\ThotamAuth\Http\Controllers\UserController;
 |
 */
 
-Route::middleware(['web', 'auth', 'CheckAccount', 'CheckHr'])->group(function () {
+Route::middleware(['web','CheckBrowser', 'auth', 'CheckAccount', 'CheckHr', 'CheckInfo'])->group(function () {
 
     //Route Admin
     Route::redirect('admin', '/', 301);
