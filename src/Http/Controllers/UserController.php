@@ -69,36 +69,58 @@ class UserController extends Controller
         return collect($response)->toJson(JSON_PRETTY_PRINT);
     }
 
-    // $("#hr_key").select2({
-    //     ajax: {
-    //       url: "http://127.0.0.1:8000/admin/member/select_hr",
-    //       dataType: 'json',
-    //       "method": "POST",
-    //       delay: 250,
-    //       data: function (params) {
-    //         return {
-    //           search: params.term, // search term
-    //           page: params.page,
-    //           perPage: 20
-    //         };
-    //       },
-    //       processResults: function (data, params) {
-    //         // parse the results into the format expected by Select2
-    //         // since we are using custom formatting functions we do not need to
-    //         // alter the remote JSON data, except to indicate that infinite
-    //         // scrolling can be used
-    //         params.page = params.page || 1;
 
-    //         return {
-    //           results: data.hrs,
-    //           pagination: {
-    //             more: (params.page * 20) < data.hr_count
-    //           }
-    //         };
-    //       },
-    //       cache: true
-    //     },
-    //     placeholder: 'Search for a repository',
-    //     minimumInputLength: 1
-    //   });
+    //Livewire with select2
+window.thotam_ajax_select2 = function(thotam_el, thotam_livewire_id, url, perPage, token) {
+    $(thotam_el).select2({
+        placeholder: $(thotam_el).attr("thotam-placeholder"),
+        minimumResultsForSearch: $(thotam_el).attr("thotam-search"),
+        allowClear: !!$(thotam_el).attr("thotam-allow-clear"),
+        dropdownParent: $("#" + $(thotam_el).attr("id") + "_div"),
+        ajax: {
+            url: url,
+            dataType: "json",
+            method: "POST",
+            headers: {
+                "X-CSRF-TOKEN": token,
+            },
+            delay: 1000,
+            data: function(params) {
+                return {
+                    search: params.term, // search term
+                    page: params.page || 1,
+                    perPage: perPage,
+                };
+            },
+            processResults: function(data, params) {
+                params.page = params.page || 1;
+
+                return {
+                    results: data.hrs,
+                    pagination: {
+                        more: params.page * perPage < data.hr_count,
+                    },
+                };
+            },
+            cache: true,
+        },
+    });
+
+    if (!!$(thotam_el).attr("multiple")) {
+        $(thotam_el).on("select2:close", function(e) {
+            thotam_livewire_id.set(
+                $(thotam_el).attr("wire:model"),
+                $(thotam_el).val()
+            );
+        });
+    } else {
+        $(thotam_el).on("change", function(e) {
+            thotam_livewire_id.set(
+                $(thotam_el).attr("wire:model"),
+                $(thotam_el).val()
+            );
+        });
+    }
+};
+
 }
