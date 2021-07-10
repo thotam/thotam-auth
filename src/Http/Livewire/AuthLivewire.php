@@ -260,7 +260,11 @@ class AuthLivewire extends Component
         $this->phone = $this->user->phone;
         $this->hr_key = $this->user->hr_key;
 
-        $this->hr_info_arrays = HR::select("key", "hoten")->get()->toArray();;
+        if (!!$this->hr_key) {
+            $this->hr_info_arrays = HR::where('key', $this->hr_key)->get()->toArray();
+        } else {
+            $this->hr_info_arrays = [];
+        }
 
         $this->linkStatus = true;
         $this->modal_title = "Liên kết Tài khoản - ID: ".$this->user_id;

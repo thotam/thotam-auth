@@ -93,12 +93,12 @@
                                     <label class="col-form-label text-indigo" for="hr_key">Nhân viên:</label>
                                     <div class="select2-success" id="hr_key_div" wire:ignore>
                                         <select class="form-control px-2" thotam-allow-clear="true" thotam-placeholder="Liên kết với nhân viên ..." thotam-search="10" wire:model="hr_key" id="hr_key" style="width: 100%" x-init="thotam_ajax_select2($el, @this, '{{ route('admin.member.select_hr') }}', 15, '{{ csrf_token() }}')">
-                                            {{--  @if (!!count($hr_info_arrays))
+                                            @if (!!count($hr_info_arrays))
                                                 <option selected></option>
                                                 @foreach ($hr_info_arrays as $hr_info_array)
                                                     <option value="{{ $hr_info_array["key"] }}">[{{ $hr_info_array["key"] }}] {{ $hr_info_array["hoten"] }}</option>
                                                 @endforeach
-                                            @endif  --}}
+                                            @endif
                                         </select>
                                     </div>
                                     @error('hr_key')
