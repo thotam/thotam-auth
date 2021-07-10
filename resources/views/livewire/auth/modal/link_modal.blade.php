@@ -91,14 +91,14 @@
                             <div class="col-12">
                                 <div class="form-group">
                                     <label class="col-form-label text-indigo" for="hr_key">Nhân viên:</label>
-                                    <div class="select2-success" id="hr_key_div">
-                                        <select class="form-control px-2 thotam-select2" thotam-allow-clear="true" thotam-placeholder="Liên kết với nhân viên ..." thotam-search="10" wire:model="hr_key" id="hr_key" style="width: 100%">
-                                            @if (!!count($hr_info_arrays))
+                                    <div class="select2-success" id="hr_key_div" wire:ignore>
+                                        <select class="form-control px-2" thotam-allow-clear="true" thotam-placeholder="Liên kết với nhân viên ..." thotam-search="10" wire:model="hr_key" id="hr_key" style="width: 100%" >
+                                            {{--  @if (!!count($hr_info_arrays))
                                                 <option selected></option>
                                                 @foreach ($hr_info_arrays as $hr_info_array)
                                                     <option value="{{ $hr_info_array["key"] }}">[{{ $hr_info_array["key"] }}] {{ $hr_info_array["hoten"] }}</option>
                                                 @endforeach
-                                            @endif
+                                            @endif  --}}
                                         </select>
                                     </div>
                                     @error('hr_key')

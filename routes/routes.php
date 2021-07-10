@@ -25,6 +25,7 @@ Route::middleware(['web', 'auth', 'CheckAccount', 'CheckHr', 'CheckInfo'])->grou
         Route::group(['prefix' => 'member'], function () {
 
             Route::get('user',  [UserController::class, 'index'])->name('admin.member.user');
+            Route::post('select_hr',  [UserController::class, 'select_hr'])->name('admin.member.select_hr');
         });
 
     });
