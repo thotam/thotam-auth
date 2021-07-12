@@ -274,12 +274,11 @@ class AdminUserDataTable extends DataTable
                   ->footer("Họ tên")
                   ->filterView(view('thotam-laravel-datatables-filter::input', ['c_placeholder' => "Họ tên"])->with("colum_filter_id")),
             Column::make("email")
-                  ->title("Email")
+                  ->title("Địa chỉ")
                   ->width(150)
-                  ->searchable(false)
+                  ->searchable(true)
                   ->orderable(false)
-                  ->footer("Email")
-                  ->filterView(view('thotam-laravel-datatables-filter::input', ['c_placeholder' => "Email"])->with("colum_filter_id")),
+                  ->footer("Địa chỉ"),
             Column::make("phone")
                   ->title("Số điện thoại")
                   ->width(50)
