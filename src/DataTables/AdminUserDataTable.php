@@ -54,7 +54,10 @@ class AdminUserDataTable extends DataTable
                 }
 
                 if (!!request('hr_key_filter')) {
-                    $query->where('users.hr_key', 'like', '%' . request('hr_key_filter') . '%');
+                    $query->whereHas('hr', function ($query2) {
+                        $query2->where('hrs.hoten', 'like', '%' . request('hr_key_filter') . '%');
+                        $query2->orWhere('hrs.key', 'like', '%' . request('hr_key_filter') . '%');
+                    });
                 }
 
                 if (!!request('update_hr_status_filter') && request('update_hr_status_filter') != -999) {
