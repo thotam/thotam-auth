@@ -298,10 +298,16 @@ class AuthLivewire extends Component
         try {
             if (!!$this->hr_key) {
                 $this->user->update([
-                    "hr_key" => $this->hr_key
+                    "hr_key" => $this->hr_key,
+                    "link_at" => now(),
+                    "link_by" => $this->hr->key,
                 ]);
             } else {
                 $this->user->hr()->dissociate()->save();
+                $this->user->update([
+                    "link_at" => now(),
+                    "link_by" => $this->hr->key,
+                ]);
             }
 
             HR_Sync_Job::dispatch($this->user);

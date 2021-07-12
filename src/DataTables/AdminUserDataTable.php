@@ -3,6 +3,7 @@
 namespace Thotam\ThotamAuth\DataTables;
 
 use Auth;
+use Carbon\Carbon;
 use App\Models\User;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
@@ -12,6 +13,19 @@ use Yajra\DataTables\Services\DataTable;
 
 class AdminUserDataTable extends DataTable
 {
+    public $hr, $table_id;
+
+    /**
+     * __construct
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->hr = Auth::user()->hr;
+        $this->table_id = "admin-user-table";
+    }
+
     /**
      * Build DataTable class.
      *
@@ -20,22 +34,80 @@ class AdminUserDataTable extends DataTable
      */
     public function dataTable($query)
     {
-        $hr = Auth::user()->hr;
-
         return datatables()
             ->eloquent($query)
-            ->addColumn('action', function ($query) use ($hr) {
+            ->filter(function ($query) {
+                if (!!request('id_filter')) {
+                    $query->where('users.id', 'like', '%' . request('id_filter') . '%');
+                }
+
+                if (!!request('name_filter')) {
+                    $query->where('users.name', 'like', '%' . request('name_filter') . '%');
+                }
+
+                if (!!request('email_filter')) {
+                    $query->where('users.email', 'like', '%' . request('email_filter') . '%');
+                }
+
+                if (!!request('phone_filter')) {
+                    $query->where('users.phone', 'like', '%' . request('phone_filter') . '%');
+                }
+
+                if (!!request('hr_key_filter')) {
+                    $query->where('users.hr_key', 'like', '%' . request('hr_key_filter') . '%');
+                }
+
+                if (!!request('update_hr_status_filter') && request('update_hr_status_filter') != -999) {
+                    if (request('update_hr_status_filter') == 1) {
+                        $query->has('update_hr');
+                    } else {
+                        $query->doesntHave('update_hr');
+                    }
+                }
+
+                if (request('active_filter') !== NULL && request('active_filter') != -999) {
+                    if (request('active_filter') == 1) {
+                        $query->where('users.active', true);
+                    } elseif (request('active_filter') == -1) {
+                        $query->where('users.active', 0);
+                    } else {
+                        $query->where('users.active', NULL);
+                    }
+                }
+
+                if (!!request('created_at_start_filter')) {
+                    $time = Carbon::createFromFormat('Y-m-d', request('created_at_start_filter'))->startOfDay();
+                    $query->where('users.created_at', ">=", $time);
+                }
+
+                if (!!request('created_at_end_filter')) {
+                    $time = Carbon::createFromFormat('Y-m-d', request('created_at_end_filter'))->endOfDay();
+                    dd($time, request('created_at_end_filter'));
+                    $query->where('users.created_at', "<=", $time);
+                }
+
+                if (!!request('link_at_start_filter')) {
+                    $time = Carbon::createFromFormat('Y-m-d', request('link_at_start_filter'))->startOfDay();
+                    $query->where('users.link_at', ">=", $time);
+                }
+
+                if (!!request('link_at_end_filter')) {
+                    $time = Carbon::createFromFormat('Y-m-d', request('link_at_end_filter'))->endOfDay();
+                    $query->where('users.link_at', "<=", $time);
+                }
+            }, true)
+            ->addColumn('action', function ($query) {
                 $Action_Icon="<div class='action-div icon-4 px-0 mx-1 d-flex justify-content-around text-center'>";
 
-                if ($hr->can("edit-user")) {
+                if ($this->hr->can("edit-user")) {
                     $Action_Icon.="<div class='col action-icon-w-50 action-icon' thotam-livewire-method='edit_user' thotam-model-id='$query->id'><i class='text-twitter fas fa-user-edit'></i></div>";
                 }
 
-                if ($hr->can("link-user")) {
+                if ($this->hr->can("link-user")) {
                     $Action_Icon.="<div class='col action-icon-w-50 action-icon' thotam-livewire-method='link_user' thotam-model-id='$query->id'><i class='text-success fas fa-link'></i></div>";
                 }
 
-                if ($hr->can("reset-password-user")) {
+                if ($this->hr->can("reset-password-user")) {
                     $Action_Icon.="<div class='col action-icon-w-50 action-icon' thotam-livewire-method='reset_password' thotam-model-id='$query->id'><i class='text-linux fas fa-user-lock'></i></div>";
                 }
 
@@ -44,10 +116,17 @@ class AdminUserDataTable extends DataTable
                 return $Action_Icon;
             })
             ->editColumn('created_at', function ($query) {
-                return $query->created_at->format("d-m-Y H:i:s");
+                return $query->created_at->format("d-m-Y H:i");
             })
             ->editColumn('updated_at', function ($query) {
-                return $query->updated_at->format("d-m-Y H:i:s");
+                return $query->updated_at->format("d-m-Y H:i");
+            })
+            ->editColumn('link_at', function ($query) {
+                if (!!$query->link_at) {
+                    return $query->link_at->format("d-m-Y H:i");
+                } else {
+                    return NULL;
+                }
             })
             ->editColumn('active', function ($query) {
                 if ($query->active === 0) {
@@ -58,13 +137,28 @@ class AdminUserDataTable extends DataTable
                     return "Đang hoạt động";
                 }
             })
+            ->addColumn('update_hr_status', function ($query) {
+                if (!!$query->update_hr) {
+                    return "<span class='badge badge-success'>Có</span>";
+                } else {
+                    return "<span class='badge badge-danger'>Không</span>";
+                }
+            })
+            ->addColumn('nhoms', function ($query) {
+                if (!!$query->hr && !!$query->hr->thanhvien_of_nhoms->count()) {
+                    return $query->hr->thanhvien_of_nhoms->pluck('full_name')->implode(', ');
+                } else {
+                    return NULL;
+                }
+            })
             ->editColumn('hr.key', function ($query) {
                 if (!!optional($query->hr)->key) {
                     return "[".optional($query->hr)->key ."] ".optional($query->hr)->hoten;
                 } else {
                     return NULL;
                 }
-            });
+            })
+            ->rawColumns(['action', 'update_hr_status' ]);;
     }
 
     /**
@@ -81,7 +175,9 @@ class AdminUserDataTable extends DataTable
             $query->orderBy('id', 'desc');
         };
 
-        return $query->with(["hr:key,hoten"]);
+        $query->with("hr:key,hoten", 'update_hr', 'hr.thanhvien_of_nhoms:id,full_name');
+
+        return $query;
     }
 
     /**
@@ -92,10 +188,26 @@ class AdminUserDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-                    ->setTableId('user-table')
+                    ->setTableId($this->table_id)
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
-                    ->dom("<'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'row'<'col-sm-12 table-responsive't>><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>>")
+                    ->minifiedAjax("",NULL, [
+                        "name_filter" => '$("#' . $this->table_id . '-name-filter").val()',
+                        "email_filter" => '$("#' . $this->table_id . '-email-filter").val()',
+                        "phone_filter" => '$("#' . $this->table_id . '-phone-filter").val()',
+                        "update_hr_status_filter" => '$("#' . $this->table_id . '-update_hr_status-filter").val()',
+                        "hr_key_filter" => '$("#' . $this->table_id . '-hr_key-filter").val()',
+                        "created_at_start_filter" => '$("#' . $this->table_id . '-created_at-start-filter").val()',
+                        "created_at_end_filter" => '$("#' . $this->table_id . '-created_at-end-filter").val()',
+                        "link_at_start_filter" => '$("#' . $this->table_id . '-link_at-start-filter").val()',
+                        "link_at_end_filter" => '$("#' . $this->table_id . '-link_at-end-filter").val()',
+                        "active_filter" => '$("#' . $this->table_id . '-active-filter").val()',
+                        //"id_filter" => '$("#' . $this->table_id . '-id-filter").val()',
+                    ])
+                    ->dom("<'row'<'col-md-6 col-sm-12'l><'col-md-6 col-sm-12'f>r><'row'<'col-sm-12 table-responsive't>><'row'<'col-md-5 col-sm-12'i><'col-md-7 col-sm-12'p>><'d-none'B>")
+                    ->buttons(
+                        Button::make('excel')->addClass("btn btn-success waves-effect")->text('<span class="fas fa-file-excel mx-2"></span> Export'),
+                        Button::make('reload')->addClass("btn btn-info waves-effect")->text('<span class="fas fa-filter mx-2"></span> Filter'),
+                    )
                     ->parameters([
                         "autoWidth" => false,
                         "lengthMenu" => [
@@ -105,13 +217,25 @@ class AdminUserDataTable extends DataTable
                         "order" => [],
                         'initComplete' => 'function(settings, json) {
                             var api = this.api();
+
+                            $(document).on("click", "#filter_submit", function(e) {
+                                api.draw(false);
+                                e.preventDefault();
+                            });
+
                             window.addEventListener("dt_draw", function(e) {
                                 api.draw(false);
                                 e.preventDefault();
                             })
+
+                            $("thead#' . $this->table_id . '-thead").insertAfter(api.table().header());
+
                             api.buttons()
                                 .container()
+                                .removeClass("btn-group")
                                 .appendTo($("#datatable-buttons"));
+
+                            $("#datatable-buttons").removeClass("d-none")
                         }',
                     ]);
     }
@@ -136,30 +260,43 @@ class AdminUserDataTable extends DataTable
                   ->addClass('text-center')
                   ->width(5)
                   ->searchable(true)
-                  ->orderable(true)
+                  ->orderable(false)
                   ->footer("ID"),
+                  //->filterView(view('thotam-laravel-datatables-filter::input', ['c_placeholder' => "ID"])->with("colum_filter_id")),
             Column::make("name")
                   ->title("Họ tên")
                   ->width(200)
-                  ->searchable(true)
-                  ->orderable(true)
-                  ->footer("Họ tên"),
+                  ->searchable(false)
+                  ->orderable(false)
+                  ->footer("Họ tên")
+                  ->filterView(view('thotam-laravel-datatables-filter::input', ['c_placeholder' => "Họ tên"])->with("colum_filter_id")),
             Column::make("email")
                   ->title("Email")
                   ->width(150)
-                  ->searchable(true)
+                  ->searchable(false)
                   ->orderable(false)
-                  ->footer("Email"),
+                  ->footer("Email")
+                  ->filterView(view('thotam-laravel-datatables-filter::input', ['c_placeholder' => "Email"])->with("colum_filter_id")),
             Column::make("phone")
                   ->title("Số điện thoại")
                   ->width(50)
-                  ->searchable(true)
+                  ->addClass('text-center')
+                  ->searchable(false)
                   ->orderable(false)
-                  ->footer("Số điện thoại"),
+                  ->footer("Số điện thoại")
+                  ->filterView(view('thotam-laravel-datatables-filter::input', ['c_placeholder' => "SĐT"])->with("colum_filter_id")),
+            Column::make("update_hr_status")
+                  ->title("Yêu cầu")
+                  ->width(10)
+                  ->addClass('text-center')
+                  ->searchable(false)
+                  ->orderable(false)
+                  ->footer("Yêu cầu")
+                  ->filterView(view('thotam-laravel-datatables-filter::select-single', ['selects' => $this->getYeucausProperty(), 'c_placeholder' => "Yêu cầu"])->with("colum_filter_id")),
             Column::make("hr.key")
                   ->title("Liên kết với nhân viên")
                   ->width(200)
-                  ->searchable(true)
+                  ->searchable(false)
                   ->orderable(false)
                   ->render("function() {
                         if (!!data) {
@@ -168,16 +305,30 @@ class AdminUserDataTable extends DataTable
                             return null;
                         }
                     }")
-                  ->footer("Liên kết với nhân viên"),
+                  ->footer("Liên kết với nhân viên")
+                  ->filterView(view('thotam-laravel-datatables-filter::input', ['c_placeholder' => "Nhân viên"])->with("colum_filter_id")),
+            Column::computed("nhoms")
+                  ->title("Nhóm")
+                  ->searchable(false)
+                  ->width(50)
+                  ->orderable(false)
+                  ->footer("Nhóm"),
             Column::computed("active")
                   ->title("Trạng thái")
-                  ->searchable(true)
+                  ->searchable(false)
                   ->width(20)
-                  ->orderable(true)
-                  ->footer("Trạng thái"),
-          Column::computed('created_at')
+                  ->orderable(false)
+                  ->footer("Trạng thái")
+                  ->filterView(view('thotam-laravel-datatables-filter::select-single', ['selects' => $this->getTrangThaisProperty(), 'c_placeholder' => "Trạng thái"])->with("colum_filter_id")),
+            Column::computed('created_at')
                   ->title("Thời gian đăng ký")
+                  ->width(20)
                   ->footer("Thời gian đăng ký")
+                  ->filterView(view('thotam-laravel-datatables-filter::date-range')->with("colum_filter_id")),
+            Column::computed('link_at')
+                  ->title("Thời gian cấp quyền")
+                  ->footer("Thời gian cấp quyền")
+                  ->filterView(view('thotam-laravel-datatables-filter::date-range')->with("colum_filter_id"))
         ];
     }
 
@@ -189,5 +340,22 @@ class AdminUserDataTable extends DataTable
     protected function filename()
     {
         return 'User_' . date('YmdHis');
+    }
+
+    public function getYeucausProperty()
+    {
+        return [
+            "1" => "Có",
+            "-1" => "Không",
+        ];
+    }
+
+    public function getTrangThaisProperty()
+    {
+        return [
+            "1" => "Đang hoạt động",
+            "0" => "Chưa kích hoạt",
+            "-1" => "Đã vô hiệu hóa",
+        ];
     }
 }

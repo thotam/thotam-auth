@@ -30,8 +30,21 @@ php artisan vendor:publish --provider="Laravel\Fortify\FortifyServiceProvider"
 ```
 
 ```php
-Add "phone", "active" to fillable of User Models
+Add "phone", "active", "link_at", "link_by" to fillable of User Models
 Add     use SoftDeletes; use Userstamps; to  User Models
+
+add
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'link_at' => 'datetime',
+    ];
+
+to User Models
+
 ```
 
 ```php
