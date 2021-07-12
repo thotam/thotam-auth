@@ -35,92 +35,36 @@ class UserController extends Controller
      */
     public function select_hr(Request $request)
     {
-        $hrs = HR::where('active', true);
+        $hrs = HR::whereNull('deleted_by');
 
         if (!!$request->search) {
             $hrs->where(function($query) use ($request) {
                 $query->where('key', 'like', "%" . $request->search . "%")
                       ->orWhere('hoten', 'like', "%" . $request->search . "%");
             })->select('key', 'hoten');
-        } else {
-            //$hrs->where('active', 999);
         }
 
-        $response['hr_count'] = $hrs->count();
+        $response['total_count'] = $hrs->count();
 
         if (!!$request->perPage) {
             $hrs->limit($request->perPage);
 
             if (!!$request->page) {
-                return 2;
-                $hrs->offset($request->page * $request->perPage);
+                $hrs->offset(($request->page - 1) * $request->perPage);
             }
         }
 
-        $response_hrs = [];
+        $response_data = [];
 
         foreach ($hrs->get() as $hr) {
-            $response_hrs['id'] = $hr->key;
-            $response_hrs['text'] = $hr->hoten;
+            $response_data[] = [
+                "id" => $hr->key,
+                "text" => '[' . $hr->key . ']' . $hr->hoten,
+            ];
         }
 
-        $response['hrs'] = $response_hrs;
+        $response['data'] = $response_data;
 
         return collect($response)->toJson(JSON_PRETTY_PRINT);
     }
-
-
-    //Livewire with select2
-window.thotam_ajax_select2 = function(thotam_el, thotam_livewire_id, url, perPage, token) {
-    $(thotam_el).select2({
-        placeholder: $(thotam_el).attr("thotam-placeholder"),
-        minimumResultsForSearch: $(thotam_el).attr("thotam-search"),
-        allowClear: !!$(thotam_el).attr("thotam-allow-clear"),
-        dropdownParent: $("#" + $(thotam_el).attr("id") + "_div"),
-        ajax: {
-            url: url,
-            dataType: "json",
-            method: "POST",
-            headers: {
-                "X-CSRF-TOKEN": token,
-            },
-            delay: 1000,
-            data: function(params) {
-                return {
-                    search: params.term, // search term
-                    page: params.page || 1,
-                    perPage: perPage,
-                };
-            },
-            processResults: function(data, params) {
-                params.page = params.page || 1;
-
-                return {
-                    results: data.hrs,
-                    pagination: {
-                        more: params.page * perPage < data.hr_count,
-                    },
-                };
-            },
-            cache: true,
-        },
-    });
-
-    if (!!$(thotam_el).attr("multiple")) {
-        $(thotam_el).on("select2:close", function(e) {
-            thotam_livewire_id.set(
-                $(thotam_el).attr("wire:model"),
-                $(thotam_el).val()
-            );
-        });
-    } else {
-        $(thotam_el).on("change", function(e) {
-            thotam_livewire_id.set(
-                $(thotam_el).attr("wire:model"),
-                $(thotam_el).val()
-            );
-        });
-    }
-};
-
 }
