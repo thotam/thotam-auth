@@ -59,7 +59,7 @@ class UserController extends Controller
         foreach ($hrs->get() as $hr) {
             $response_data[] = [
                 "id" => $hr->key,
-                "text" => '[' . $hr->key . ']' . $hr->hoten,
+                "text" => '[' . $hr->key . '] ' . $hr->hoten,
             ];
         }
 
