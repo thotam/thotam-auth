@@ -37,19 +37,19 @@ class UserController extends Controller
     {
         $hrs = HR::whereNull('deleted_by');
 
-        if (!!$request->search) {
-            $hrs->where(function($query) use ($request) {
+        if ((bool)$request->search) {
+            $hrs->where(function ($query) use ($request) {
                 $query->where('key', 'like', "%" . $request->search . "%")
-                      ->orWhere('hoten', 'like', "%" . $request->search . "%");
+                    ->orWhere('hoten', 'like', "%" . $request->search . "%");
             })->select('key', 'hoten');
         }
 
         $response['total_count'] = $hrs->count();
 
-        if (!!$request->perPage) {
+        if ((bool)$request->perPage) {
             $hrs->limit($request->perPage);
 
-            if (!!$request->page) {
+            if ((bool)$request->page) {
                 $hrs->offset(($request->page - 1) * $request->perPage);
             }
         }
@@ -57,9 +57,15 @@ class UserController extends Controller
         $response_data = [];
 
         foreach ($hrs->get() as $hr) {
+            if ((bool)$request->mail_tag && (bool)$hr->getMail("tuyendung")) {
+                $text = '[' . $hr->key . '] ' . $hr->hoten . " (" . $hr->getMail("tuyendung") . ")";
+            } else {
+                $text = '[' . $hr->key . '] ' . $hr->hoten;
+            }
+
             $response_data[] = [
                 "id" => $hr->key,
-                "text" => '[' . $hr->key . '] ' . $hr->hoten,
+                "text" => $text,
             ];
         }
 
