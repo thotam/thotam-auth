@@ -15,7 +15,7 @@ class AddLinkInfoColumnsToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->timestamp('link_at')->nullable()->default(null)->after('active');
-            $table->string('link_by', 10)->nullable()->default(null)->after('link_at');
+            $table->string('link_by', 20)->nullable()->default(null)->after('link_at');
             $table->foreign('link_by')->references('key')->on('hrs')->onDelete('SET NULL')->onUpdate('cascade');
         });
     }
