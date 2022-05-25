@@ -28,8 +28,9 @@ class AddLinkInfoColumnsToUsersTable extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('active');
-            $table->dropColumn('phone');
+            $table->dropColumn('link_at');
+            $table->dropForeign(['link_by']);
+            $table->dropColumn('link_by');
         });
     }
 }
