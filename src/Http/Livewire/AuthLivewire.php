@@ -7,7 +7,6 @@ use App\Models\User;
 use Livewire\Component;
 use Thotam\ThotamHr\Models\HR;
 use Illuminate\Support\Facades\Hash;
-use Thotam\ThotamAuth\Jobs\HR_Sync_Job;
 use App\Actions\Fortify\PasswordValidationRules;
 
 class AuthLivewire extends Component
@@ -15,10 +14,10 @@ class AuthLivewire extends Component
     use PasswordValidationRules;
 
     /**
-    * Các biến sử dụng trong Component
-    *
-    * @var mixed
-    */
+     * Các biến sử dụng trong Component
+     *
+     * @var mixed
+     */
     public $name, $email, $phone, $active, $password, $password_confirmation, $hr_key;
     public $modal_title, $toastr_message;
     public $hr;
@@ -39,7 +38,7 @@ class AuthLivewire extends Component
      *
      * @var array
      */
-    protected $listeners = ['dynamic_update_method', 'edit_user', 'link_user', 'reset_password', ];
+    protected $listeners = ['dynamic_update_method', 'edit_user', 'link_user', 'reset_password',];
 
     /**
      * dynamic_update_method
@@ -67,15 +66,16 @@ class AuthLivewire extends Component
      *
      * @var array
      */
-    protected function rules() {
+    protected function rules()
+    {
         return [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$this->user_id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $this->user_id,
             'phone' => [
                 'required',
                 'regex:/^(032|033|034|035|036|037|038|039|086|096|097|098|081|082|083|084|085|088|091|094|056|058|092|070|076|077|078|079|089|090|093|099|059|087)+([0-9]{7})$/',
                 'numeric',
-                'unique:users,phone,'.$this->user_id,
+                'unique:users,phone,' . $this->user_id,
             ],
             'active' => 'nullable|boolean',
             'hr_key' => 'nullable|exists:hrs,key',
@@ -173,7 +173,7 @@ class AuthLivewire extends Component
         $this->active = !!$this->user->active;
 
         $this->editStatus = true;
-        $this->modal_title = "Chỉnh sửa Tài khoản - ID: ".$this->user_id;
+        $this->modal_title = "Chỉnh sửa Tài khoản - ID: " . $this->user_id;
         $this->toastr_message = "Chỉnh sửa Tài khoản thành công";
 
         $this->dispatchBrowserEvent('unblockUI');
@@ -198,12 +198,12 @@ class AuthLivewire extends Component
         $this->dispatchBrowserEvent('unblockUI');
         $this->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,'.$this->user_id,
+            'email' => 'required|string|email|max:255|unique:users,email,' . $this->user_id,
             'phone' => [
                 'required',
                 'regex:/^(032|033|034|035|036|037|038|039|086|096|097|098|081|082|083|084|085|088|091|094|056|058|092|070|076|077|078|079|089|090|093|099|059|087)+([0-9]{7})$/',
                 'numeric',
-                'unique:users,phone,'.$this->user_id,
+                'unique:users,phone,' . $this->user_id,
             ],
             'active' => 'nullable|boolean',
         ]);
@@ -267,7 +267,7 @@ class AuthLivewire extends Component
         }
 
         $this->linkStatus = true;
-        $this->modal_title = "Liên kết Tài khoản - ID: ".$this->user_id;
+        $this->modal_title = "Liên kết Tài khoản - ID: " . $this->user_id;
         $this->toastr_message = "Liên kết Tài khoản thành công";
 
         $this->dispatchBrowserEvent('unblockUI');
@@ -309,8 +309,6 @@ class AuthLivewire extends Component
                     "link_by" => $this->hr->key,
                 ]);
             }
-
-            HR_Sync_Job::dispatch($this->user);
         } catch (\Illuminate\Database\QueryException $e) {
             $this->dispatchBrowserEvent('unblockUI');
             $this->dispatchBrowserEvent('toastr', ['type' => 'warning', 'title' => "Thất bại", 'message' => implode(" - ", $e->errorInfo)]);
@@ -353,7 +351,7 @@ class AuthLivewire extends Component
         $this->phone = $this->user->phone;
 
         $this->resetStatus = true;
-        $this->modal_title = "Reset mật khẩu - ID: ".$this->user_id;
+        $this->modal_title = "Reset mật khẩu - ID: " . $this->user_id;
         $this->toastr_message = "Reset mật khẩu thành công";
 
         $this->dispatchBrowserEvent('unblockUI');

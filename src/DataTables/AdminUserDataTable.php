@@ -85,6 +85,7 @@ class AdminUserDataTable extends DataTable
 
                 if (!!request('created_at_end_filter')) {
                     $time = Carbon::createFromFormat('Y-m-d', request('created_at_end_filter'))->endOfDay();
+                    // dd($time, request('created_at_end_filter'));
                     $query->where('users.created_at', "<=", $time);
                 }
 
