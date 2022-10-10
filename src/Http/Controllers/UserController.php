@@ -3,12 +3,20 @@
 namespace Thotam\ThotamAuth\Http\Controllers;
 
 use Auth;
+use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Thotam\ThotamHr\Models\HR;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Thotam\ThotamIcpc1hnApi\Models\iCPC1HN_Account;
 use Thotam\ThotamAuth\DataTables\AdminUserDataTable;
+use Thotam\ThotamIcpc1hnApi\Traits\Login\LoginTrait;
 
 class UserController extends Controller
 {
+    use LoginTrait;
+
     /**
      * index
      *
@@ -72,5 +80,142 @@ class UserController extends Controller
         $response['data'] = $response_data;
 
         return collect($response)->toJson(JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * login_stnv
+     *
+     * @return void
+     */
+    public function login_stnv()
+    {
+        return view('thotam-auth::auth.login-stnv', ['urlback' => request("urlback")]);
+    }
+
+    /**
+     * login_stnv_action
+     *
+     * @return void
+     */
+    public function login_stnv_action(Request $request)
+    {
+        //Validat Dữ liệu Input
+        $rules = [
+            'email' => 'required|string',
+            'password' => ['required', 'string'],
+            'remember' => 'nullable|boolean',
+        ];
+
+        $messages = [];
+
+        $attributes = [
+            'email' => 'email/số điện thoại',
+            'password' => 'mật khẩu',
+            'remember' => 'ghi nhớ',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages, $attributes);
+
+        if ($validator->fails()) {
+            return back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $validated = $validator->validated();
+
+        //Đăng nhập qua API sổ tay
+        $response = $this->iCPC1HN_Login($validated['email'], $validated['password']);
+
+        if ($response->status() != 200) {
+            return back()
+                ->withErrors(['email' => "Đã có sự cố sảy ra, vui lòng thử lại sau"])
+                ->withInput();
+        }
+
+        //Xử lý nếu như đăng nhập thành công
+        $json_array = $response->json();
+        if ($json_array["ResCode"] == 0) {
+            $data = collect(collect($json_array)->get('Data'));
+
+            $iCPC1HN_Account = iCPC1HN_Account::updateOrCreate([
+                'account' => $data->get('idEmployee'),
+            ], [
+                'password' => $validated['password'],
+                'token' => $json_array["token"],
+                'json_array' => $json_array,
+                'hr_key' => (bool)$data->get('employeeCode') ? $data->get('employeeCode') : null,
+                'active' => true,
+            ]);
+
+            if ($iCPC1HN_Account->user_id != null) {
+                $User = User::find($iCPC1HN_Account->user_id);
+            } else {
+                $User = User::firstOrCreate([
+                    'phone' => $data->get('idEmployee'),
+                ], [
+                    'name' => $data->get('nameEmployee'),
+                    'password' => Hash::make($validated['password']),
+                    'active' => true,
+                    'hr_key' => (bool)$data->get('employeeCode') ? $data->get('employeeCode') : null,
+                ]);
+            }
+
+            if ($User->hr_key === null) {
+                $User->update([
+                    'hr_key' => (bool)$data->get('employeeCode') ? $data->get('employeeCode') : null,
+                ]);
+            }
+
+            Auth::login($User, (bool)$validated['remember']);
+
+            //update nhóm
+
+            //Update user_id
+            if ($iCPC1HN_Account->user_id === null) {
+                $iCPC1HN_Account->update([
+                    'user_id' => $User->id,
+                ]);
+            }
+
+            if ($request->wantsJson()) {
+                return response()->json(['two_factor' => false]);
+            } elseif (!!$request->get('urlback')) {
+                return redirect($request->get('urlback'));
+            } else {
+                return redirect()->intended(config('fortify.home'));
+            }
+        }
+
+        //Đăng nhập bằng tài khoản member
+        $phone = User::select('phone')->where('email', $validated['email'])->orWhere('phone', $validated['email'])->first();
+
+        if (empty($phone)) {
+            return back()
+                ->withErrors(['email' => "Không tìm thấy tài khoản nào với Email/Số điện thoại này"])
+                ->withInput();
+        }
+
+        if (Auth::attempt(['phone' => $validated['email'], 'password' => $validated['password']], (bool)$validated['remember'])) {
+            // Authentication passed...
+            if ($request->wantsJson()) {
+                return response()->json(['two_factor' => false]);
+            } elseif (!!$request->get('urlback')) {
+                return redirect($request->get('urlback'));
+            } else {
+                return redirect()->intended(config('fortify.home'));
+            }
+        } else {
+            return back()
+                ->withErrors(['password' => "Đăng nhập thất bại. Mật khẩu không đúng"])
+                ->withInput();
+        }
+
+        //Trả lại thông tin đăng nhập thất bại
+        if (Str::contains($json_array["ResMes"], 'đăng nhập') && Str::contains($json_array["ResMes"], 'mật khẩu') && Str::contains($json_array["ResMes"], 'không hợp lệ')) {
+            return back()
+                ->withErrors(['email' => $json_array["ResMes"]])
+                ->withInput();
+        }
     }
 }
