@@ -196,7 +196,7 @@ class UserController extends Controller
                 ->withInput();
         }
 
-        if (Auth::attempt(['phone' => $validated['email'], 'password' => $validated['password']], (bool)collect($validated)->get('remember'))) {
+        if (Auth::attempt(['phone' => $phone, 'password' => $validated['password']], (bool)collect($validated)->get('remember'))) {
             // Authentication passed...
             if ($request->wantsJson()) {
                 return response()->json(['two_factor' => false]);
