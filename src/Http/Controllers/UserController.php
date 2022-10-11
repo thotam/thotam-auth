@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Thotam\ThotamHr\Models\HR;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Thotam\ThotamAuth\Models\iCPC1HN_Group;
 use Thotam\ThotamIcpc1hnApi\Models\iCPC1HN_Account;
 use Thotam\ThotamAuth\DataTables\AdminUserDataTable;
 use Thotam\ThotamIcpc1hnApi\Traits\Login\LoginTrait;
@@ -124,6 +125,8 @@ class UserController extends Controller
 
         $validated = $validator->validated();
 
+        \Thotam\ThotamAuth\Jobs\iCPC1HN_Group_Sync_Job::dispatch();
+
         //Đăng nhập qua API sổ tay
         $response = $this->iCPC1HN_Login($validated['email'], $validated['password']);
 
@@ -170,6 +173,10 @@ class UserController extends Controller
             Auth::login($User, (bool)collect($validated)->get('remember'));
 
             //update nhóm
+            $nhom_array = array_filter(iCPC1HN_Group::whereIn('icpc1hn_group_id', explode(';', $data->get('idGroup')))->pluck('nhom_id')->toArray());
+            if (count($nhom_array) > 0 && $User->hr) {
+                $User->hr->thanhvien_of_nhoms()->syncWithoutDetaching($nhom_array);
+            }
 
             //Update user_id
             if ($iCPC1HN_Account->user_id === null) {
