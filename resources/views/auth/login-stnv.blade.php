@@ -69,7 +69,17 @@
 				</div>
 				<div class="card-footer py-3 px-4 px-sm-5">
 					<div class="text-center text-muted">
-						Bạn chưa có tài khoản? <a href="{{ URL::route('register', ['urlback' => request('urlback')]) }}">Đăng ký</a>
+						{{-- Bạn chưa có tài khoản? <a href="{{ URL::route('register', ['urlback' => request('urlback')]) }}">Đăng ký</a> --}}
+						Bạn chưa có tài khoản? Tải ngay app <span class="text-danger">Sổ tay nhân viên</span> để đăng ký tài khoản</a>
+					</div>
+					<div class="text-center pt-2">
+						<a href="https://play.google.com/store/apps/details?id=com.bk.cpc1hn" target="_blank" rel="noopener noreferrer">
+							<button type="button" class="mx-2 btn icon-btn btn-lg btn-outline-black"><span class="fa-brands fa-google-play"></span></button>
+						</a>
+
+						<a href="https://apps.apple.com/vn/app/cpc1hn/id1393555624" target="_blank" rel="noopener noreferrer">
+							<button type="button" class="mx-2 btn icon-btn btn-lg btn-outline-black"><span class="fa-brands fa-app-store-ios"></span></button>
+						</a>
 					</div>
 				</div>
 			</div>
