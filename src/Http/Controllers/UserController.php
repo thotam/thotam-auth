@@ -193,7 +193,9 @@ class UserController extends Controller
 			Auth::login($User, $remember = (bool)collect($validated)->get('remember'));
 
 			//update nhóm
-			$nhom_array = array_filter(iCPC1HN_Group::whereIn('icpc1hn_group_id', explode(';', $data->get('idGroup')))->pluck('nhom_id')->toArray());
+			$nhom_ids = explode('|', $data->get('idGroup'));
+			$nhom_ids = array_filter(array_map('trim', $nhom_ids));
+			$nhom_array = array_filter(iCPC1HN_Group::whereIn('icpc1hn_group_id', $nhom_ids)->pluck('nhom_id')->toArray());
 			if (count($nhom_array) > 0 && $User->hr) {
 				$User->hr->thanhvien_of_nhoms()->syncWithoutDetaching($nhom_array);
 			}
