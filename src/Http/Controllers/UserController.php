@@ -170,6 +170,26 @@ class UserController extends Controller
 				]);
 			}
 
+			//Update Email
+			if ($User->email === null) {
+				$EmployeeInfo = $this->iCPC1HN_GetEmployeeInforByToken($json_array["token"]);
+
+				if ($EmployeeInfo->status() == 200) {
+					$EmployeeInfoJson = $EmployeeInfo->json();
+					if ($EmployeeInfoJson["ResCode"] == 0) {
+						$email = collect(collect(collect($EmployeeInfoJson)->get('Data'))->first())->get('Emasil');
+						if (empty($email)) {
+							$email = collect(collect(collect($EmployeeInfoJson)->get('Data'))->first())->get('EmailCompany');
+						}
+						if (!empty($email)) {
+							$User->update([
+								'email' => $email,
+							]);
+						}
+					}
+				}
+			}
+
 			Auth::login($User, $remember = (bool)collect($validated)->get('remember'));
 
 			//update nhóm
