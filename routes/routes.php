@@ -30,7 +30,7 @@ Route::middleware(['web', 'auth', 'CheckAccount', 'CheckHr', 'CheckInfo'])->grou
     });
 });
 
-Route::middleware(['web'])->group(function () {
+Route::middleware(['web', 'guest'])->group(function () {
     Route::get('login-stnv',  [UserController::class, 'login_stnv'])->name('login_stnv');
     Route::post('login-stnv',  [UserController::class, 'login_stnv_action']);
 });
