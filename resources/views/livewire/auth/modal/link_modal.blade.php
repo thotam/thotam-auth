@@ -93,7 +93,7 @@
 									<div class="form-group">
 										<label class="col-form-label">Nhóm:</label>
 										<div id="name_div">
-											<span class="form-control px-2" style="width: 100%">{{ collect(collect($user->hr->icpc1hn_account->json_array)->get('Data'))->get('idGroup') }}</span>
+											<span class="form-control px-2 h-auto" style="width: 100%">{{ collect(collect(collect($user->hr->icpc1hn_account->json_array)->get('UserInfo'))->get('GroupLst'))->merge(collect(collect($user->hr->icpc1hn_account->json_array)->get('UserInfo'))->get('ShopLst'))->pluck('ShopCode')->implode(', ') }}</span>
 										</div>
 									</div>
 								</div>
