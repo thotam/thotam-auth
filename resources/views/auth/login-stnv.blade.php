@@ -70,7 +70,7 @@
 				<div class="card-footer py-3 px-4 px-sm-5">
 					<div class="text-center text-muted">
 						{{-- Bạn chưa có tài khoản? <a href="{{ URL::route('register', ['urlback' => request('urlback')]) }}">Đăng ký</a> --}}
-						Bạn chưa có tài khoản? Tải ngay app <span class="text-danger">Sổ tay nhân viên</span> để đăng ký tài khoản</a>
+						Bạn chưa có tài khoản? Tải ngay app <span class="text-danger">Sổ tay nhân viên</span> để đăng ký tài khoản
 					</div>
 					<div class="text-center pt-2">
 						<a href="https://play.google.com/store/apps/details?id=com.bk.cpc1hn" target="_blank" rel="noopener noreferrer">
