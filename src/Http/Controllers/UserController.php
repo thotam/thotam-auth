@@ -163,16 +163,28 @@ class UserController extends Controller
             }
 
             if ($iCPC1HN_Account->user_id != null) {
+                $User = User::find($iCPC1HN_Account->user_id);
                 $User = User::where('email', $data->get('Email'))->orWhere('phone', $phone)->first();
             } else {
-                $User = User::firstOrCreate([
-                    'email' => $data->get('Email'),
-                ], [
-                    'name' => $data->get('FullName'),
-                    'password' => Hash::make($validated['password']),
-                    'active' => true,
-                    'hr_key' => null,
-                ]);
+                if (!empty($phone)) {
+                    $User = User::firstOrCreate([
+                        'phone' => $phone,
+                    ], [
+                        'name' => $data->get('FullName'),
+                        'password' => Hash::make($validated['password']),
+                        'active' => true,
+                        'hr_key' => null,
+                    ]);
+                } else {
+                    $User = User::firstOrCreate([
+                        'email' => $data->get('Email'),
+                    ], [
+                        'name' => $data->get('FullName'),
+                        'password' => Hash::make($validated['password']),
+                        'active' => true,
+                        'hr_key' => null,
+                    ]);
+                }
             }
 
             //Update phone
