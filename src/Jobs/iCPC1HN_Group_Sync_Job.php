@@ -14,10 +14,14 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Thotam\ThotamAuth\Models\iCPC1HN_Group;
+use Thotam\ThotamUpharma\Traits\JobTrait;
 
 class iCPC1HN_Group_Sync_Job implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use JobTrait;
+
+    public $UserName, $Password, $Token, $uPharmaID;
 
     /**
      * Create a new job instance.
@@ -35,38 +39,24 @@ class iCPC1HN_Group_Sync_Job implements ShouldQueue
      */
     public function handle()
     {
-        $admin_key = config('thotam-icpc1hn-api.adminHrKey');
-        $token = HR::find($admin_key)->icpc1hn_token;
+        $this->UserName = config('thotam-upharma.API.User.UserName');
+        $this->Password = config('thotam-upharma.API.User.Password');
+        $__getAccount = $this->__getAccount();
+        $this->Token = $__getAccount['Token'];
+        $this->uPharmaID = $__getAccount['UserInfo']['uPharmaID'];
 
-        $response = Http::withHeaders([
-            'Content-Type' => 'application/json',
-        ])->post(config('thotam-icpc1hn-api.kpi.order.getServiceOffice'), [
-            "token" => $token
-        ]);
+        $__getOrganizationLsts = $this->__getOrganizationLst(null)['OrganizationLst'];
 
-        if ($response->status() == 200) {
-            $json_array = $response->json();
-            if ($json_array["ResCode"] == 0) {
-                if (!!$json_array["Data"]) {
-                    foreach ($json_array["Data"] as $data) {
-                        if ((bool)collect($data)->get("IDGroup")) {
-                            iCPC1HN_Group::updateOrCreate(
-                                ['icpc1hn_group_id' => collect($data)->get("IDGroup")],
-                                [
-                                    'active' => true,
-                                    'deleted_at' => NULL,
-                                ]
-                            );
-                        }
-                    }
-                }
-            } else {
-                Log::error(get_class($this) . ': ' . $json_array["ResCode"] . " " . $json_array["ResMes"]);
-                throw new Exception(get_class($this) . ': ' . $json_array["ResCode"] . " " . $json_array["ResMes"]);
+        foreach ($__getOrganizationLsts as $data) {
+            if ((bool)collect($data)->get("OrganizationID")) {
+                iCPC1HN_Group::updateOrCreate(
+                    ['icpc1hn_group_id' => collect($data)->get("ShopCode")],
+                    [
+                        'active' => true,
+                        'deleted_at' => NULL,
+                    ]
+                );
             }
-        } else {
-            Log::error(get_class($this) . ': Unexpected HTTP status: ' .  ' - ' . $response->status() . ' - ' . $response->getReasonPhrase());
-            throw new Exception(get_class($this) . ': Unexpected HTTP status: ' .  ' - ' . $response->status() . ' - ' . $response->getReasonPhrase());
         }
     }
 }

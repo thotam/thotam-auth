@@ -26,7 +26,7 @@
 					<h5 class="text-center text-muted font-weight-normal mb-4">
 						Đăng nhập bằng tài khoản của bạn
 						<br>
-						<span class="text-info mt-2 d-block">Có thể dùng tài khoản: <b class="text-danger">Sổ tay nhân viên</b></span>
+						<span class="text-info mt-2 d-block">Có thể dùng: <b class="text-success">Tài khoản bán hàng</b></span>
 					</h5>
 
 					<!-- Form -->
@@ -70,15 +70,9 @@
 				<div class="card-footer py-3 px-4 px-sm-5">
 					<div class="text-center text-muted">
 						{{-- Bạn chưa có tài khoản? <a href="{{ URL::route('register', ['urlback' => request('urlback')]) }}">Đăng ký</a> --}}
-						Bạn chưa có tài khoản? Tải ngay app <span class="text-danger">Sổ tay nhân viên</span> để đăng ký tài khoản</a>
-					</div>
-					<div class="text-center pt-2">
-						<a href="https://play.google.com/store/apps/details?id=com.bk.cpc1hn" target="_blank" rel="noopener noreferrer">
-							<button type="button" class="mx-2 btn icon-btn btn-lg btn-outline-black"><span class="fa-brands fa-google-play"></span></button>
-						</a>
-
-						<a href="https://apps.apple.com/vn/app/cpc1hn/id1393555624" target="_blank" rel="noopener noreferrer">
-							<button type="button" class="mx-2 btn icon-btn btn-lg btn-outline-black"><span class="fa-brands fa-app-store-ios"></span></button>
+						Bạn chưa có tài khoản? Đăng ký ngay
+						<a href="https://upharma.com.vn" target="_blank" class="text-success" rel="noopener noreferrer">
+							<b>tại đây</b>
 						</a>
 					</div>
 				</div>

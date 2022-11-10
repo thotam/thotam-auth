@@ -125,10 +125,10 @@ class UserController extends Controller
 
         $validated = $validator->validated();
 
-        \Thotam\ThotamAuth\Jobs\iCPC1HN_Group_Sync_Job::dispatch();
+        \Thotam\ThotamAuth\Jobs\iCPC1HN_Group_Sync_Job::dispatchSync();
 
         //Đăng nhập qua API sổ tay
-        $response = $this->iCPC1HN_Login($validated['email'], $validated['password']);
+        $response = $this->uPharma_Login($validated['email'], $validated['password']);
 
         if ($response->status() != 200) {
             return back()
@@ -138,52 +138,74 @@ class UserController extends Controller
 
         //Xử lý nếu như đăng nhập thành công
         $json_array = $response->json();
-        if ($json_array["ResCode"] == 0) {
-            $data = collect(collect($json_array)->get('Data'));
+        if ($json_array["RespCode"] == 0) {
+            $data = collect(collect($json_array)->get('UserInfo'));
 
             $iCPC1HN_Account = iCPC1HN_Account::updateOrCreate([
-                'account' => $data->get('idEmployee'),
+                'account' => $data->get('Email'),
             ], [
                 'password' => $validated['password'],
-                'token' => $json_array["token"],
+                'token' => $json_array["Token"],
                 'json_array' => $json_array,
-                'hr_key' => (bool)$data->get('employeeCode') ? $data->get('employeeCode') : null,
+                'hr_key' => null,
                 'active' => true,
             ]);
 
+            $EmployeeInfo = $this->iCPC1HN_GetEmployeeInforByToken($json_array["Token"]);
+            if ($EmployeeInfo->status() == 200) {
+                $EmployeeInfoJson = $EmployeeInfo->json();
+                if ($EmployeeInfoJson["ResCode"] == 0) {
+                    $phone = collect(collect(collect($EmployeeInfoJson)->get('Data'))->first())->get('EmployeeID');
+                    if (empty($phone)) {
+                        $phone = collect(collect(collect($EmployeeInfoJson)->get('Data'))->first())->get('Phone');
+                    }
+                }
+            }
+
             if ($iCPC1HN_Account->user_id != null) {
-                $User = User::find($iCPC1HN_Account->user_id);
+                $User = User::where('email', $data->get('Email'))->orWhere('phone', $phone)->first();
             } else {
                 $User = User::firstOrCreate([
-                    'phone' => $data->get('idEmployee'),
+                    'email' => $data->get('Email'),
                 ], [
-                    'name' => $data->get('nameEmployee'),
+                    'name' => $data->get('FullName'),
                     'password' => Hash::make($validated['password']),
                     'active' => true,
-                    'hr_key' => (bool)$data->get('employeeCode') ? $data->get('employeeCode') : null,
+                    'hr_key' => null,
                 ]);
+            }
+
+            //Update phone
+            if ($User->phone === null) {
+                if (!empty($phone) && User::where('phone', $phone)->count() == 0) {
+                    $User->update([
+                        'phone' => $phone,
+                    ]);
+                }
             }
 
             if ($User->hr_key === null) {
-                $User->update([
-                    'hr_key' => (bool)$data->get('employeeCode') ? $data->get('employeeCode') : null,
-                ]);
-            }
-
-            //Update Email
-            if ($User->email === null) {
-                $EmployeeInfo = $this->iCPC1HN_GetEmployeeInforByToken($json_array["token"]);
-
                 if ($EmployeeInfo->status() == 200) {
                     $EmployeeInfoJson = $EmployeeInfo->json();
                     if ($EmployeeInfoJson["ResCode"] == 0) {
-                        $email = collect(collect(collect($EmployeeInfoJson)->get('Data'))->first())->get('Emasil');
-                        if (empty($email)) {
-                            $email = collect(collect(collect($EmployeeInfoJson)->get('Data'))->first())->get('EmailCompany');
-                        }
-                        if (!empty($email)) {
+                        $hr_key = collect(collect(collect($EmployeeInfoJson)->get('Data'))->first())->get('EmployeeCode');
+                        if (!empty($hr_key)) {
                             $User->update([
-                                'email' => $email,
+                                'hr_key' => $hr_key,
+                            ]);
+                        }
+                    }
+                }
+            }
+
+            if ($iCPC1HN_Account->hr_key === null) {
+                if ($EmployeeInfo->status() == 200) {
+                    $EmployeeInfoJson = $EmployeeInfo->json();
+                    if ($EmployeeInfoJson["ResCode"] == 0) {
+                        $hr_key = collect(collect(collect($EmployeeInfoJson)->get('Data'))->first())->get('EmployeeCode');
+                        if (!empty($hr_key)) {
+                            $iCPC1HN_Account->update([
+                                'hr_key' => $hr_key,
                             ]);
                         }
                     }
@@ -192,9 +214,8 @@ class UserController extends Controller
 
             Auth::login($User, $remember = (bool)collect($validated)->get('remember'));
 
-            //update nhóm
-            $nhom_ids = explode('|', $data->get('idGroup'));
-            $nhom_ids = array_filter(array_map('trim', $nhom_ids));
+            // update nhóm
+            $nhom_ids = collect($data->get('ShopLst'))->merge(collect($data->get('GroupLst')))->pluck('ShopCode')->toArray();
             $nhom_array = array_filter(iCPC1HN_Group::whereIn('icpc1hn_group_id', $nhom_ids)->pluck('nhom_id')->toArray());
             if (count($nhom_array) > 0 && $User->hr) {
                 $User->hr->thanhvien_of_nhoms()->syncWithoutDetaching($nhom_array);
@@ -217,15 +238,15 @@ class UserController extends Controller
         }
 
         //Đăng nhập bằng tài khoản member
-        $phone = User::select('phone')->where('email', $validated['email'])->orWhere('phone', $validated['email'])->first();
+        $email = User::select('email')->where('email', $validated['email'])->orWhere('phone', $validated['email'])->first();
 
-        if (empty($phone)) {
+        if (empty($email)) {
             return back()
                 ->withErrors(['email' => "Không tìm thấy tài khoản nào với Email/Số điện thoại này"])
                 ->withInput();
         }
 
-        if (Auth::attempt(['phone' => $phone, 'password' => $validated['password']], (bool)collect($validated)->get('remember'))) {
+        if (Auth::attempt(['email' => $email, 'password' => $validated['password']], (bool)collect($validated)->get('remember'))) {
             // Authentication passed...
             if ($request->wantsJson()) {
                 return response()->json(['two_factor' => false]);
@@ -241,9 +262,9 @@ class UserController extends Controller
         }
 
         //Trả lại thông tin đăng nhập thất bại
-        if (Str::contains($json_array["ResMes"], 'đăng nhập') && Str::contains($json_array["ResMes"], 'mật khẩu') && Str::contains($json_array["ResMes"], 'không hợp lệ')) {
+        if (Str::contains($json_array["RespText"], 'đăng nhập') && Str::contains($json_array["RespText"], 'mật khẩu') && Str::contains($json_array["RespText"], 'không hợp lệ')) {
             return back()
-                ->withErrors(['email' => $json_array["ResMes"]])
+                ->withErrors(['email' => $json_array["RespText"]])
                 ->withInput();
         }
     }
