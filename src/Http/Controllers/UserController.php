@@ -171,7 +171,7 @@ class UserController extends Controller
 			}
 
 			//Active HR
-			$User->hr->update(["active", true]);
+			$User->load('hr')->hr->update(["active", true]);
 
 			//Update Email
 			if ($User->email === null) {
