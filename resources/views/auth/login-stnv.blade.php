@@ -1,3 +1,7 @@
+@php
+	header('Location: https://member.cpc1hn.com.vn/');
+	exit();
+@endphp
 @extends('layouts.layout-blank')
 
 @section('styles')
